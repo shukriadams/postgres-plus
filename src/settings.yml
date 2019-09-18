@@ -1,0 +1,12 @@
+# example settings file
+version: 1
+jobs:
+    one:
+        database: my-database
+        crondmask: "*/10 * * * * *"
+        preserve: 10
+        # optional s3 bucket target
+        s3:
+            bucket: my-bucket
+            key: somekey
+            secret: somesecret
