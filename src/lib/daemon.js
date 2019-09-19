@@ -1,5 +1,6 @@
 let CronJob = require('cron').CronJob,
     Logger = require('winston-wrapper'),
+    exec = require('madscience-node-exec'),
     _jobs = [];
 
 class CronProcess
@@ -8,6 +9,7 @@ class CronProcess
 
         this.cronmask = args.cronmask;
         this.name = args.name;
+        this.database = args.database;
         this.logInfo = Logger.instance().info.info;
         //this.logError = Logger.instance().error.error;
         this.busy = false;
@@ -21,6 +23,13 @@ class CronProcess
             try
             {
                 console.log(`${this.name}`);
+                const folder ='/tmp/postgresdumps';
+                await exec({ cmd : 'pg_dump',
+                    args :[this.database, 
+                        '|' ,
+                        'gzip',
+                        `>${folder}/${this.database}_$(date +%Y-%m-%d__%H-%M-%S).tar.gz`]
+                })
                 // backup
                 // push to s3?
                 // log
