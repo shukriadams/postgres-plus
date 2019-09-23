@@ -6,7 +6,7 @@
         daemon = require('./lib/daemon'),
         fs = require('fs-extra'),
         settings = await settingsProvider.get(),
-        logPath = './data/logs';
+        logPath = './backups/logs';
 
     fs.ensureDirSync(logPath);
     Logger.initialize(logPath);

@@ -24,9 +24,9 @@ class CronProcess
         
         this.logInfo(`Starting job ${this.database}`);
         
-        const folder = path.join('./data/dumps', this.database);
+        const folder = path.join('./backups/dumps', this.database);
         const settings = await settingsProvider.get();
-        const historyLogFolder = path.join('./data/flags', this.database);
+        const historyLogFolder = path.join('./backups/flags', this.database);
 
         fs.ensureDirSync(folder);
         fs.ensureDirSync(historyLogFolder);
