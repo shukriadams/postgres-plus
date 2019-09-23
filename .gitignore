@@ -1,5 +1,5 @@
 
-src/logs
+src/data
 src/node_modules
 vagrant/.vagrant
 vagrant/ubuntu-xenial-16.04-cloudimg-console.log

@@ -18,6 +18,8 @@ module.exports = {
             
             // force default structures
             rawSettings = Object.assign({
+                version : 1,
+                pgdumpTestMode : false,
                 jobs : {}
             }, rawSettings);
     
@@ -30,7 +32,7 @@ module.exports = {
                     archive : null
                 }, job);
             }
-    
+
             _settings = rawSettings;
         }
 
