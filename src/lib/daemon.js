@@ -60,7 +60,7 @@ class CronProcess
                 // log
                 this.logInfo(`Completed job ${this.database}`);
             } catch (ex){
-                //this.logError(ex);
+                this.logError(ex);
             } finally {
                 this.busy = false;
             }
