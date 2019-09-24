@@ -1,0 +1,18 @@
+version: "2"
+services:
+  sapostgres:
+    image: shukriadams/postgres:latest
+    container_name: sapostgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: passwurd
+      PGDATA: /var/lib/postgresql/data/mydata # needed to allow postgress to mount to external volume folder
+    ports:
+    - "5432:5432"
+    - "3100:3000"
+    volumes:
+      - ./data:/var/lib/postgresql/data/mydata:rw
+      - ./backups:/var/app/backups:rw
+
+
+      

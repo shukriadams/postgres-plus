@@ -175,9 +175,10 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 5432
 
 # shukri start
+# Note : requires debian docker image
 RUN apt-get update \
     && apt-get install wget -y \
-    && apt-get install wget -y \
+    && apt-get install git -y \
     && apt-get install python-minimal -y \
     && wget -O /tmp/nodejs.deb https://deb.nodesource.com/node_10.x/pool/main/n/nodejs/nodejs_10.16.3-1nodesource1_amd64.deb \
     && sh -c 'dpkg -i /tmp/nodejs.deb' \ 
@@ -185,14 +186,17 @@ RUN apt-get update \
     && chmod 700 -R /var/app \
     && chown -R postgres /var/app    
 
-COPY index.js /var/app/app.js
+COPY .clone/src/ /var/app/
 
-RUN npm install pm2 -g 
-
-RUN cd /var/app \
-    && pm2 start /var/app/index.js --name "postgres-backup" \
+# note : pm2 start fails if app not called app.js
+RUN npm install pm2 -g \
+    && cd /var/app \
+    && npm install \
+    && mv index.js app.js \ 
+    && pm2 start /var/app/app.js --name "postgres-backup" \
     && pm2 ecosystem \
     && pm2 save \
     && pm2 start 
+# shuki end
 
 CMD ["postgres"]

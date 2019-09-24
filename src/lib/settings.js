@@ -1,5 +1,4 @@
 let fs = require('fs-extra'),
-    sanitize = require('sanitize-filename'),
     yaml = require('js-yaml'),
     _settings = null;
 
@@ -7,7 +6,8 @@ module.exports = {
     get : async function(){
 
         if (!_settings){
-
+            let rawSettings = null;
+            
             try {
                 let settingsYML = await fs.readFile('./settings.yml', 'utf8');
                 rawSettings = yaml.safeLoad(settingsYML);
