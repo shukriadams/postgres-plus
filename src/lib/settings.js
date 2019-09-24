@@ -7,7 +7,7 @@ module.exports = {
 
         if (!_settings){
             let rawSettings = null;
-            
+
             try {
                 let settingsYML = await fs.readFile('./settings.yml', 'utf8');
                 rawSettings = yaml.safeLoad(settingsYML);
@@ -26,7 +26,6 @@ module.exports = {
             for (let jobName in rawSettings.jobs){
                 let job = rawSettings.jobs[jobName];
                 rawSettings.jobs[jobName] = Object.assign({
-                    database : 'not-set',
                     cronmask : '*/10 * * * * *',
                     enabled : true,
                     archive : null

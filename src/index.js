@@ -5,8 +5,14 @@
         Logger = require('winston-wrapper'),
         daemon = require('./lib/daemon'),
         fs = require('fs-extra'),
+        process = require('process'),
         settings = await settingsProvider.get(),
         logPath = './backups/logs';
+
+    if (!await fs.exists('./settings.yml')){
+        console.log('settings.yml not found, app will exit');
+        process.exit(1);
+    }
 
     fs.ensureDirSync(logPath);
     Logger.initialize(logPath);

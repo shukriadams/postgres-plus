@@ -193,7 +193,8 @@ RUN npm install pm2 -g \
     && cd /var/app \
     && npm install \
     && mv index.js app.js \ 
-    && pm2 start /var/app/app.js --name "postgres-backup" \
+    # note : pm2 requires you to be IN the folder of the script to set it up
+    && pm2 start app.js --name "postgres-backup" \
     && pm2 ecosystem \
     && pm2 save \
     && pm2 start 

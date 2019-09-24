@@ -13,6 +13,6 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data/mydata:rw
       - ./backups:/var/app/backups:rw
-
+    command: su postgres -c "cd /var/app && pm2 start app.js --name "postgres-backup" && postgres"
 
       
