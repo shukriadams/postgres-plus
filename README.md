@@ -5,7 +5,8 @@ Adds automatic backup daemon.
 
 dumps folder needs to be owned by user postgres (id 999) 
 
-    sudo chown 999 -R ./data
+    sudo chown 0 -R ./data
+    sudo chown 999 -R ./backups
 
 backup command to run in container :
 

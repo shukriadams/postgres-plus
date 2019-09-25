@@ -15,7 +15,7 @@ class CronProcess
         this.cronmask = args.cronmask;
         this.database = args.database;
         this.logInfo = Logger.instance().info.info;
-        //this.logError = Logger.instance().error.error;
+        this.logError = Logger.instance().error.error;
         this.busy = false;
         
     }
@@ -37,22 +37,24 @@ class CronProcess
 
             try
             {
-                if (settings.pgdumpTestMode){
-                    let now = new Date(),
-                        filenameTimestamp = `${timebelt.toShortDate(now, 'y-m-d')}__${timebelt.toShortTime(now, 'h-m-s')}`;
+                let now = new Date(),
+                    filenameTimestamp = `${timebelt.toShortDate(now, 'y-m-d')}__${timebelt.toShortTime(now, 'h-m-s')}`;
 
+                if (settings.pgdumpTestMode){
                     fs.outputFile(`${folder}/${this.database}_${filenameTimestamp}.tar.gz`, 'test dump content');
-                } else 
+                } else {
+                    console.log('starting pg_dump');
                     await exec({ 
                         cmd : 'pg_dump',
                         args : [ 
-                            this.database, 
-                            '|',
-                            'gzip',
-                            `>${folder}/${this.database}_$(date +%Y-%m-%d__%H-%M-%S).tar.gz`
+                            '-f',
+                            `${folder}/${this.database}_${filenameTimestamp}.dmp`,
+                            this.database
                         ]
                     });
+                }
 
+                jobPassed = true;
                 // backup
                 // push to s3?
                 //jobPassed = true;

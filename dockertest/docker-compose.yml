@@ -1,8 +1,8 @@
 version: "2"
 services:
-  sapostgres:
+  postgres:
     image: shukriadams/postgres:latest
-    container_name: sapostgres
+    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: passwurd
@@ -13,6 +13,7 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data/mydata:rw
       - ./backups:/var/app/backups:rw
-    command: su postgres -c "cd /var/app && pm2 start app.js --name "postgres-backup" && postgres"
+      - ./settings.yml:/var/app/settings.yml
+    #command: su postgres -c "cd /var/app && pm2 start app.js --name "postgres-backup" && postgres"
 
       

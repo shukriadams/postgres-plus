@@ -1,6 +1,6 @@
 
 src/backups
-docker/backups
+dockertest/backups
 docker/.clone
 src/node_modules
 vagrant/.vagrant
