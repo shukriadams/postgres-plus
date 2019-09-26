@@ -34,7 +34,7 @@ class CronProcess
         this.cronJob = new CronJob(this.job.cronmask, async ()=>{
         
             let jobPassed = false;
-            console.log(`starting job at ${this.database}`);
+            
             try
             {
                 let now = new Date(),
@@ -69,12 +69,11 @@ class CronProcess
                         return fs.statSync(path.join(folder, a)).mtime.getTime() - 
                             fs.statSync(path.join(folder, b)).mtime.getTime();
                     });
-                    console.log(files);
+
                     for (let i = 0 ; i < files.length - this.job.preserve ; i ++ ){
                         let file = path.join(folder, files[i]);
                         await fs.remove(file);
                         this.logInfo(`Cleaned out dump ${file}.`);
-                        console.log(`Cleaned out dump ${file}.`);
                     }
                 }
 
@@ -96,6 +95,7 @@ class CronProcess
             // write static status flag
             jsonfile.writeFileSync(path.join(historyLogFolder, `status.json`), {
                 passed : jobPassed,
+                next : new Date(this.cronJob.nextDates().toString()).getTime(),
                 date : now
             });
             
@@ -111,6 +111,8 @@ class CronProcess
         null, 
         null, 
         true /* runonitit */ );
+
+        
     }
 }
 
