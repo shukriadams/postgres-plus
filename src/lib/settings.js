@@ -26,9 +26,21 @@ module.exports = {
             for (let jobName in rawSettings.jobs){
                 let job = rawSettings.jobs[jobName];
                 rawSettings.jobs[jobName] = Object.assign({
+                    
+                    // standard cron mask for job to run at
                     cronmask : '*/10 * * * * *',
+
+                    // if set to true, job will be ignored. convenient way to keep job in settings file without having to run it
                     enabled : true,
+
+                    // max number of previous backups above which files will be auto-deleted
+                    preserve : 10,  
+
+                    // object of arguments to pass to pg_dump
+                    args : {},
+
                     archive : null
+
                 }, job);
             }
 

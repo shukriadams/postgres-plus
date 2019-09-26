@@ -10,11 +10,10 @@ let CronJob = require('cron').CronJob,
 
 class CronProcess
 {
-    constructor(args){
+    constructor(database, job){
 
-        this.cronmask = args.cronmask;
-        this.database = args.database;
-        this.args = args.args;
+        this.database = database;
+        this.job = job;
         this.logInfo = Logger.instance().info.info;
         this.logError = Logger.instance().error.error;
         this.busy = false;
@@ -32,10 +31,10 @@ class CronProcess
         fs.ensureDirSync(folder);
         fs.ensureDirSync(historyLogFolder);
 
-        this.cronJob = new CronJob(this.cronmask, async ()=>{
+        this.cronJob = new CronJob(this.job.cronmask, async ()=>{
         
             let jobPassed = false;
-
+            console.log(`starting job at ${this.database}`);
             try
             {
                 let now = new Date(),
@@ -44,19 +43,18 @@ class CronProcess
                 // convert args object into array, property name prepended with single dash for single char names
                 // and double dash for longer
                 let pgArgs = [];
-                for (let arg in this.args){
+                for (let arg in this.job.args){
                     pgArgs.push(arg.length === 1 ? `-${arg}` : `--${arg}`);
-                    pgArgs.push(this.args[arg]);
+                    pgArgs.push(this.job.args[arg]);
                 }
 
                 pgArgs.push('-f');
                 pgArgs.push(`${folder}/${this.database}_${filenameTimestamp}.dmp`);
                 pgArgs.push(this.database);
 
-                console.log(pgArgs);
-
                 if (settings.pgdumpTestMode){
-                    fs.outputFile(`${folder}/${this.database}_${filenameTimestamp}.tar.gz`, 'test dump content');
+                    // in test mode, write a shim dump file with a string in it.
+                    fs.outputFile(`${folder}/${this.database}_${filenameTimestamp}.dmp`, 'test dump content');
                 } else {
                     await exec({ 
                         cmd : 'pg_dump',
@@ -64,13 +62,29 @@ class CronProcess
                     });
                 }
 
-                jobPassed = true;
-                // backup
-                // push to s3?
-                //jobPassed = true;
+                // cleanup old
+                var files = await fs.readdir(folder);
+                if (files.length > this.job.preserve){
+                    files.sort(function(a, b) {
+                        return fs.statSync(path.join(folder, a)).mtime.getTime() - 
+                            fs.statSync(path.join(folder, b)).mtime.getTime();
+                    });
+                    console.log(files);
+                    for (let i = 0 ; i < files.length - this.job.preserve ; i ++ ){
+                        let file = path.join(folder, files[i]);
+                        await fs.remove(file);
+                        this.logInfo(`Cleaned out dump ${file}.`);
+                        console.log(`Cleaned out dump ${file}.`);
+                    }
+                }
+
+                // push to s3
 
                 // log
                 this.logInfo(`Completed job ${this.database}`);
+                
+                jobPassed = true;
+                
             } catch (ex){
                 this.logError(ex);
             } finally {
@@ -109,12 +123,12 @@ module.exports = {
         const settings = await settingsProvider.get();
 
         for (const database in settings.jobs){
-            const job = settings.jobs[database],
-                process = new CronProcess({
-                    database : database,
-                    cronmask: job.cronmask,
-                    args : job.args
-                });
+            const job = settings.jobs[database];
+
+            if (!job.enabled)
+                continue;
+
+            const process = new CronProcess(database, job);
 
             _jobs.push(process);
             await process.start();
