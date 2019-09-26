@@ -14,6 +14,7 @@ class CronProcess
 
         this.cronmask = args.cronmask;
         this.database = args.database;
+        this.args = args.args;
         this.logInfo = Logger.instance().info.info;
         this.logError = Logger.instance().error.error;
         this.busy = false;
@@ -40,17 +41,26 @@ class CronProcess
                 let now = new Date(),
                     filenameTimestamp = `${timebelt.toShortDate(now, 'y-m-d')}__${timebelt.toShortTime(now, 'h-m-s')}`;
 
+                // convert args object into array, property name prepended with single dash for single char names
+                // and double dash for longer
+                let pgArgs = [];
+                for (let arg in this.args){
+                    pgArgs.push(arg.length === 1 ? `-${arg}` : `--${arg}`);
+                    pgArgs.push(this.args[arg]);
+                }
+
+                pgArgs.push('-f');
+                pgArgs.push(`${folder}/${this.database}_${filenameTimestamp}.dmp`);
+                pgArgs.push(this.database);
+
+                console.log(pgArgs);
+
                 if (settings.pgdumpTestMode){
                     fs.outputFile(`${folder}/${this.database}_${filenameTimestamp}.tar.gz`, 'test dump content');
                 } else {
-                    console.log('starting pg_dump');
                     await exec({ 
                         cmd : 'pg_dump',
-                        args : [ 
-                            '-f',
-                            `${folder}/${this.database}_${filenameTimestamp}.dmp`,
-                            this.database
-                        ]
+                        args : pgArgs
                     });
                 }
 
@@ -81,7 +91,12 @@ class CronProcess
                     date : now
                 });
 
-        }, null, true, null, null, true /*runonitit*/);
+        }, 
+        null, 
+        true, 
+        null, 
+        null, 
+        true /* runonitit */ );
     }
 }
 
@@ -97,7 +112,8 @@ module.exports = {
             const job = settings.jobs[database],
                 process = new CronProcess({
                     database : database,
-                    cronmask: job.cronmask 
+                    cronmask: job.cronmask,
+                    args : job.args
                 });
 
             _jobs.push(process);

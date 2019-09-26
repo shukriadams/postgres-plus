@@ -14,6 +14,9 @@ services:
       - ./data:/var/lib/postgresql/data/mydata:rw
       - ./backups:/var/app/backups:rw
       - ./settings.yml:/var/app/settings.yml
-    #command: su postgres -c "cd /var/app && pm2 start app.js --name "postgres-backup" && postgres"
+    # Caveat : this command MUST be disabled when initializing the container. Initializing will create and set the 
+    # rights for the data volume mount, and is managed internally by the container. Once initialized, re-enable
+    # command to start both the backup server and postgres service
+    command: su postgres -c "cd /var/app && pm2 start app.js --name "postgres-backup" && postgres"
 
       
