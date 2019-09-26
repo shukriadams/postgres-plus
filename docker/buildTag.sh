@@ -54,7 +54,6 @@ docker cp buildcontainer:/tmp/build.tar.gz . &&
 docker build -t shukriadams/postgres-plus . &&
 docker tag shukriadams/postgres-plus:latest shukriadams/postgres-plus:$TAG &&
 
-docker push shukriadams/postgres-plus:latest &&
 docker push shukriadams/postgres-plus:$TAG &&
 
 echo "Build done";

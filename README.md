@@ -1,13 +1,33 @@
 # postgres-plus
 
-Partial fork of official Postgres docker image https://github.com/docker-library/postgres
-Adds automatic backup daemon.
+Fork of official Postgres 9 docker container from https://github.com/docker-library/postgres
 
-dumps folder needs to be owned by user postgres (id 999) 
+Adds automatic backup process and HTTP status API.
 
-    sudo chown 0 -R ./data
-    sudo chown 999 -R ./backups
+## Setup
 
-backup command to run in container :
+- create a folder to store dumps etc in, and assign it to postgres user id
 
-    pg_dump mydev | gzip >/tmp/postgresdumps/mydev_$(date +%Y-%m-%d__%H-%M-%S).tar.gz
+    mkdir backups
+    chown 999 -R ./backups
+
+- if you're setting up a brand new container instance with no existin data folder,
+    - comment out the command line in the docker-compose.yml to disable  backup service.
+    - start 
+
+        docker-compose up -d
+    
+    - confirm that container is running and postgres has started
+
+        docker logs postgres
+
+    - stop container
+
+        docker-compose down
+
+    - uncomment command line in docker-compose.yml to re-enable backup service
+
+- start 
+
+    docker-compose up -d
+
