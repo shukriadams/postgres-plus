@@ -6,7 +6,8 @@ jobs:
     # job name must match database name
     mytest:
         # cronmask must be wrapped in quotes, as the slashes can break YML
-        cronmask: "*/10 * * * * *"
+        # "0 11 * * *" = every day at 11 am
+        cronmask: "0 11 * * *"
         preserve: 10
         # optional s3 bucket target
         s3:
