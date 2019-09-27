@@ -95,7 +95,7 @@ class CronProcess
             // write static status flag
             jsonfile.writeFileSync(path.join(historyLogFolder, `status.json`), {
                 passed : jobPassed,
-                next : new Date(this.cronJob.nextDates().toString()).getTime(),
+                next : new Date(this.cronJob.nextDates().toString()),
                 date : now
             });
             
